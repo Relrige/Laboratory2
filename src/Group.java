@@ -44,10 +44,16 @@ public class Group {
                 String[] g = s.split(",");
                 for (int i = 0; i < g.length; i++) g[i] = g[i].trim();
 
-                goods.add(new Good(g[0], g[1], g[2], Integer.parseInt(g[3]), Double.parseDouble(g[4])));
+                if(!goods.contains(goodByName(g[0]))) goods.add(new Good(g[0], g[1], g[2], Integer.parseInt(g[3]), Double.parseDouble(g[4])));
 
             }
         }
+    }
+    public Good goodByName(String name){
+        for (Good g : goods){
+            if (g.getName().equals(name)) return g;
+        }
+        return null;
     }
     public void deleteGood(Good good) {
         goods.remove(good);

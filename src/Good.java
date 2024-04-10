@@ -14,10 +14,7 @@ public class Good {
     }
 
     public String toString(){
-        if (amount < 0 && price < 0) return name + ": " + description + ". Виробник - " + producer + ". Кількість: " + "кількість не визначено" + ". Ціна: " + "ціна не визначена";
-        if (amount < 0) return name + ": " + description + ". Виробник - " + producer + ". Кількість: " + "кількість не визначено" + ". Ціна: " + price;
-        if (price < 0) return name + ": " + description + ". Виробник - " + producer + ". Кількість: " + amount + ". Ціна: " + "ціна не визначена";
-        return name + ": " + description + ". Виробник - " + producer + ". Кількість - " + amount + ". Ціна - " + price;
+        return name + " (" + description + "). Виробник - " + producer + ". Кількість - " + amount + " одиниць. Ціна - " + price + " грн.";
     }
     public String getName() {
         return name;

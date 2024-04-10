@@ -29,13 +29,16 @@ public class Storage {
         String[] group = txt.toString().split(";");
         for (String s : group){
             String[] g = s.split(",");
-            if(g.length == 1) {
-                groupList.add(new Group(g[0], "опис не визначено"));
-            } else {
-                groupList.add(new Group(g[0], g[1]));
-            }
+            if(!groupList.contains(groupByName(g[0]))) groupList.add(new Group(g[0], g[1]));
         }
     }
+    public Group groupByName(String name){
+        for (Group g : groupList){
+            if (g.getName().equals(name)) return g;
+        }
+        return null;
+    }
+
     void writeGroups(String file){
         try {
             java.io.FileWriter writer = new java.io.FileWriter(file);

@@ -115,7 +115,7 @@ public class Main {
                         return;
                     }
                     for (Group group : storage.groupList) {
-                        if (group.getName().equals(groupNameField.getText())) {
+                        if (group.getName().equalsIgnoreCase(groupNameField.getText())) {
                             JOptionPane.showMessageDialog(addGroupFrame, "Група з такою назвою вже існує");
                             return;
                         }
@@ -174,8 +174,14 @@ public class Main {
                     groupNameField.setFont(new Font("Arial", Font.BOLD, 20));
                     editGroupNamePanel.add(groupNameField);
                     JButton editGroupNameButton1 = new CoolButton("Редагувати назву групи");
+                    JButton back4 = new CoolButton("Назад");
+                    JPanel buttons = new JPanel();
+                    buttons.setLayout(new GridLayout(2, 1));
+                    buttons.add(editGroupNameButton1);
+                    buttons.add(back4);
                     editGroupNameFrame.add(editGroupNamePanel);
-                    editGroupNameFrame.add(editGroupNameButton1);
+                    editGroupNameFrame.add(buttons);
+
                     editGroupNameFrame.setVisible(true);
                     editGroupNameButton1.addActionListener(e6 -> {
                         editGroupNameFrame.setVisible(false);
@@ -185,13 +191,17 @@ public class Main {
                             return;
                         }
                         for (Group group : storage.groupList) {
-                            if (group.getName().equals(groupNameField.getText())) {
+                            if (group.getName().equalsIgnoreCase(groupNameField.getText())) {
                                 JOptionPane.showMessageDialog(editGroupNameFrame, "Група з такою назвою вже існує");
                                 return;
                             }
                         }
                         storage.groupList.get(groupList.getSelectedIndex()).setName(groupNameField.getText());
                         storage.writeGroups("Files\\groups.txt");
+                    });
+                    back4.addActionListener(e7 -> {
+                        editGroupNameFrame.setVisible(false);
+                        editGroupFrame.setVisible(true);
                     });
                 });
                 editGroupDescriptionButton.addActionListener(e7 -> {
@@ -210,9 +220,20 @@ public class Main {
                     groupDescriptionField.setFont(new Font("Arial", Font.BOLD, 20));
                     editGroupDescriptionPanel.add(groupDescriptionField);
                     JButton editGroupDescriptionButton1 = new CoolButton("Редагувати опис групи");
+                    JButton back4 = new CoolButton("Назад");
+                    editGroupDescriptionPanel.add(back4);
                     editGroupDescriptionFrame.add(editGroupDescriptionPanel);
-                    editGroupDescriptionFrame.add(editGroupDescriptionButton1);
+                    JPanel buttons = new JPanel();
+                    buttons.setLayout(new GridLayout(2, 1));
+                    buttons.add(editGroupDescriptionButton1);
+                    buttons.add(back4);
+                    editGroupDescriptionFrame.add(buttons);
+
                     editGroupDescriptionFrame.setVisible(true);
+                    back4.addActionListener(e8 -> {
+                        editGroupDescriptionFrame.setVisible(false);
+                        editGroupFrame.setVisible(true);
+                    });
                     editGroupDescriptionButton1.addActionListener(e8 -> {
                         editGroupDescriptionFrame.setVisible(false);
                         groupsFrame.setVisible(true);
@@ -276,7 +297,7 @@ public class Main {
             goodsPanel.add(deleteGood);
             JButton searchGood = new CoolButton("Пошук товару");
             goodsPanel.add(searchGood);
-            JButton goodAmount = new CoolButton("Додати/списати товар");
+            JButton goodAmount = new CoolButton("Прийняти/списати товар");
             goodsPanel.add(goodAmount);
             JButton back1 = new CoolButton("Назад");
             goodsPanel.add(back1);
@@ -382,7 +403,7 @@ public class Main {
                             JOptionPane.showMessageDialog(addGoodFrame1, "Заповніть всі поля");
                             return;
                         }
-                        if (!goodAmountField.getText().matches("\\d+") || !goodPriceField.getText().matches("\\d+\\.\\d+")) {
+                        if (!goodAmountField.getText().matches("\\d+") || (!goodPriceField.getText().matches("\\d+\\.\\d+")  &&  !goodPriceField.getText().matches("\\d+"))) {
                             JOptionPane.showMessageDialog(addGoodFrame1, "Некоректні дані");
                             return;
                         }
@@ -392,7 +413,7 @@ public class Main {
                         }
                         for (Group g : storage.groupList) {
                             for (Good good : g.goods) {
-                                if (good.getName().equals(goodNameField.getText())) {
+                                if (good.getName().equalsIgnoreCase(goodNameField.getText())) {
                                     JOptionPane.showMessageDialog(addGoodFrame1, "Товар з такою назвою вже існує");
                                     return;
                                 }
@@ -475,6 +496,7 @@ public class Main {
 
             });
             deleteGood.addActionListener(e -> {
+                goodsFrame.setVisible(false);
                 JFrame deleteGoodFrame = new JFrame("Видалити товар");
                 deleteGoodFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
                 deleteGoodFrame.setSize(1080, 720);
@@ -537,6 +559,196 @@ public class Main {
                 });
             });
 
+        });
+        stats.addActionListener(e -> {
+            menu.setVisible(false);
+            storage.readGroups("Files\\groups.txt");
+            for (Group group : storage.groupList) {
+                group.readGoods();
+            }
+            JFrame statsFrame = new JFrame("Статистика");
+            statsFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+            statsFrame.setSize(1080, 720);
+            statsFrame.setLayout(new GridLayout(2, 1));
+            JPanel statsChoice = new JPanel();
+            statsChoice.setLayout(new GridLayout(5, 1));
+            JButton storageStats = new CoolButton("Всі товари на складі");
+            JButton groupStats = new CoolButton("Всі товари в групі");
+            JButton allGoodsPrice = new CoolButton("Загальна вартість товарів");
+            JButton groupGoodsPrice = new CoolButton("Вартість товарів у групі");
+            JButton back10 = new CoolButton("Назад");
+            JLabel title3 = new JLabel("Статистика");
+            JPanel infoPanel3 = new JPanel();
+            infoPanel3.setLayout(new GridLayout(1, 1));
+            title3.setHorizontalAlignment(SwingConstants.CENTER);
+            title3.setVerticalAlignment(SwingConstants.CENTER);
+            title3.setFont(new Font("Arial", Font.BOLD, 36));
+            infoPanel3.setBackground(new Color(217, 185, 155));
+            infoPanel3.add(title3);
+            statsFrame.add(infoPanel3);
+            statsChoice.add(storageStats);
+            statsChoice.add(groupStats);
+            statsChoice.add(allGoodsPrice);
+            statsChoice.add(groupGoodsPrice);
+            statsChoice.add(back10);
+            statsFrame.add(statsChoice);
+            statsFrame.setVisible(true);
+            back10.addActionListener(e1 -> {
+                statsFrame.setVisible(false);
+                menu.setVisible(true);
+            });
+            storageStats.addActionListener(e1 -> {
+                statsFrame.setVisible(false);
+                JFrame storageStatsFrame = new JFrame("Всі товари на складі");
+                storageStatsFrame.setLayout(new GridLayout(2, 1));
+                storageStatsFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+                storageStatsFrame.setSize(1080, 720);
+                storageStatsFrame.setBackground(new Color(217, 185, 155));
+                JPanel storageStatsPanel = new JPanel();
+                storageStatsPanel.setLayout(new GridLayout(1, 1));
+                String txt1 = "";
+                for (Group group : storage.groupList) {
+                    txt1 += "- " + group + ":\n";
+                    if (group.goods.isEmpty())
+                        txt1 += "   Немає товарів\n";
+                    for (Good good : group.goods) {
+                        txt1 += "   " + good + "\n";
+                    }
+                }
+                System.out.println(storage.groupList);
+                JTextArea storageStatsArea = new JTextArea(txt1);
+                storageStatsArea.setBackground(new Color(217, 185, 155));
+                storageStatsArea.setLineWrap(true);
+                storageStatsArea.setAutoscrolls(true);
+                storageStatsArea.setFont(new Font("Arial", Font.BOLD, 18));
+                storageStatsArea.setEditable(false);
+                JScrollPane scrollPane = new JScrollPane(storageStatsArea);
+                storageStatsPanel.add(scrollPane);
+                JButton back11 = new CoolButton("Назад");
+                storageStatsFrame.add(storageStatsPanel);
+                storageStatsFrame.add(back11);
+                storageStatsFrame.setVisible(true);
+                back11.addActionListener(e2 -> {
+                    storageStatsFrame.setVisible(false);
+                    statsFrame.setVisible(true);
+                });
+            });
+            groupStats.addActionListener(e1 -> {
+                statsFrame.setVisible(false);
+                JFrame groupStatsFrame = new JFrame("Всі товари в групі");
+                groupStatsFrame.setLayout(new GridLayout(2, 1));
+                groupStatsFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+                groupStatsFrame.setSize(1080, 720);
+                groupStatsFrame.setBackground(new Color(217, 185, 155));
+                JPanel groupStatsPanel = new JPanel();
+                groupStatsPanel.setLayout(new GridLayout(1, 1));
+                JComboBox<String> groupList3 = new JComboBox<>();
+                for (Group group : storage.groupList) {
+                    groupList3.addItem(group.getName());
+                }
+                groupList3.setFont(new Font("Arial", Font.BOLD, 18));
+                groupStatsPanel.add(groupList3);
+                JButton groupStatsButton = new CoolButton("Вибрати групу");
+                JButton back12 = new CoolButton("Назад");
+                JPanel buttons = new JPanel();
+                buttons.setLayout(new GridLayout(2, 1));
+                buttons.add(groupStatsButton);
+                buttons.add(back12);
+                groupStatsPanel.add(groupList3);
+                groupStatsFrame.add(groupStatsPanel);
+                groupStatsFrame.add(buttons);
+                groupStatsFrame.setVisible(true);
+                back12.addActionListener(e2 -> {
+                    groupStatsFrame.setVisible(false);
+                    statsFrame.setVisible(true);
+                });
+                groupStatsButton.addActionListener(e2 -> {
+                    groupStatsFrame.setVisible(false);
+                    JFrame groupStatsFrame1 = new JFrame("Всі товари в групі");
+                    groupStatsFrame1.setLayout(new GridLayout(2, 1));
+                    groupStatsFrame1.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+                    groupStatsFrame1.setSize(1080, 720);
+                    groupStatsFrame1.setBackground(new Color(217, 185, 155));
+                    JPanel groupStatsPanel1 = new JPanel();
+                    groupStatsPanel1.setLayout(new GridLayout(1, 1));
+                    String txt2 = "";
+                    Group group = storage.groupList.get(groupList3.getSelectedIndex());
+                    txt2 += group + ":\n";
+                    if (group.goods.isEmpty())
+                        txt2 += "Немає товарів\n";
+                    for (Good good : group.goods) {
+                        txt2 += good + "\n";
+                    }
+                    JTextArea groupStatsArea = new JTextArea(txt2);
+                    groupStatsArea.setBackground(new Color(217, 185, 155));
+                    groupStatsArea.setLineWrap(true);
+                    groupStatsArea.setAutoscrolls(true);
+                    groupStatsArea.setFont(new Font("Arial", Font.BOLD, 24));
+                    groupStatsArea.setEditable(false);
+                    JScrollPane scrollPane = new JScrollPane(groupStatsArea);
+                    groupStatsPanel1.add(scrollPane);
+                    JButton back13 = new CoolButton("Назад");
+                    groupStatsFrame1.add(groupStatsPanel1);
+                    groupStatsFrame1.add(back13);
+                    groupStatsFrame1.setVisible(true);
+                    back13.addActionListener(e3 -> {
+                        groupStatsFrame1.setVisible(false);
+                        groupStatsFrame.setVisible(true);
+                    });
+                });
+
+
+            });
+            allGoodsPrice.addActionListener(e2 ->{
+                String storagePrice = "Загальна ціна товарів на складі: ";
+                double allPrice = 0;
+                for (Group group : storage.groupList) {
+                    for (Good good : group.goods) {
+                        allPrice += good.getPrice() * good.getAmount();
+                    }
+                }
+                storagePrice += allPrice + " грн";
+                JOptionPane.showMessageDialog(statsFrame, storagePrice);
+            });
+            groupGoodsPrice.addActionListener(e1 -> {
+                statsFrame.setVisible(false);
+                JFrame chooseGroup = new JFrame("Вартість товарів у групі");
+                chooseGroup.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+                chooseGroup.setSize(1080, 720);
+                chooseGroup.setLayout(new GridLayout(2, 1));
+                JPanel chooseGroupPanel = new JPanel();
+                chooseGroupPanel.setLayout(new GridLayout(1, 1));
+                JComboBox<String> groupList4 = new JComboBox<>();
+                for (Group group : storage.groupList) {
+                    groupList4.addItem(group.getName());
+                }
+                groupList4.setFont(new Font("Arial", Font.BOLD, 18));
+                chooseGroupPanel.add(groupList4);
+                JButton chooseGroupButton = new CoolButton("Вибрати групу");
+                JButton back14 = new CoolButton("Назад");
+                JPanel buttons = new JPanel();
+                buttons.setLayout(new GridLayout(2, 1));
+                buttons.add(chooseGroupButton);
+                buttons.add(back14);
+                chooseGroup.add(chooseGroupPanel);
+                chooseGroup.add(buttons);
+                chooseGroup.setVisible(true);
+                back14.addActionListener(e2 -> {
+                    chooseGroup.setVisible(false);
+                    statsFrame.setVisible(true);
+                });
+                chooseGroupButton.addActionListener(e2 -> {
+                    Group group = storage.groupList.get(groupList4.getSelectedIndex());
+                    double groupPrice = 0;
+                    String groupPriceString = "Вартість товарів у групі " + group.getName() + ": ";
+                    for (Good good : group.goods) {
+                        groupPrice += good.getPrice() * good.getAmount();
+                    }
+                    groupPriceString += groupPrice + " грн";
+                    JOptionPane.showMessageDialog(chooseGroup, groupPriceString);
+
+                });
+            });
         });
     }
 }
