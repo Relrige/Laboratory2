@@ -6,75 +6,13 @@ public class Good {
     private double price;
 
     public Good (String name, String description, String producer, int amount, double price){
-        this.name = name;
+        this.name = name.trim();
         this.description = description;
         this.producer = producer;
         this.amount = amount;
         this.price = price;
     }
-    public Good (String name, String description, String producer){
-        this.name = name;
-        this.description = description;
-        this.producer = producer;
-        this.amount = -1;
-        this.price = -1;
-    }
-    public Good (String name, String description){
-        this.name = name;
-        this.description = description;
-        this.producer = "виробника не визначено";
-        this.amount = -1;
-        this.price = -1;
-    }
-    public Good (String name){
-        this.name = name;
-        this.description = "опис не визначено";
-        this.producer = "виробника не визначено";
-        this.amount = -1;
-        this.price = -1;
-    }
-    public Good (String name, int amount, double price){
-        this.name = name;
-        this.description = "опис не визначено";
-        this.producer = "виробника не визначено";
-        this.amount = amount;
-        this.price = price;
-    }
-    public Good (String name, String description, int amount, double price){
-        this.name = name;
-        this.description = description;
-        this.producer = "виробника не визначено";
-        this.amount = amount;
-        this.price = price;
-    }
-    public Good (String name, String description, String producer, int amount){
-        this.name = name;
-        this.description = description;
-        this.producer = producer;
-        this.amount = amount;
-        this.price = -1;
-    }
-    public Good (String name, String description, int amount){
-        this.name = name;
-        this.description = description;
-        this.producer = "виробника не визначено";
-        this.amount = amount;
-        this.price = -1;
-    }
-    public Good (String name, int amount){
-        this.name = name;
-        this.description = "опис не визначено";
-        this.producer = "виробника не визначено";
-        this.amount = amount;
-        this.price = -1;
-    }
-    public Good(String name, double price){
-        this.name = name;
-        this.description = "опис не визначено";
-        this.producer = "виробника не визначено";
-        this.amount = -1;
-        this.price = price;
-    }
+
     public String toString(){
         if (amount < 0 && price < 0) return name + ": " + description + ". Виробник - " + producer + ". Кількість: " + "кількість не визначено" + ". Ціна: " + "ціна не визначена";
         if (amount < 0) return name + ": " + description + ". Виробник - " + producer + ". Кількість: " + "кількість не визначено" + ". Ціна: " + price;

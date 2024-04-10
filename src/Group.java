@@ -1,7 +1,6 @@
-import java.io.BufferedReader;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.IOException;
+import java.io.*;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -12,30 +11,52 @@ public class Group {
 
     private String file;
     public Group (String name, String description){
-        this.name = name;
-        this.description = description;
-        this.file = "src\\" + name + ".txt";
+        this.name = name.trim();
+        this.description = description.trim();
+        this.file = "FIles\\" + name + ".txt";
+        if (!Files.exists(Paths.get(file))) {
+            try {
+                Files.createFile(Paths.get(file));
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        }
     }
     public void readGoods(){
         String txt = "";
+        File file = new File(this.file);
+
         try {
             BufferedReader reader = new BufferedReader(new FileReader(file));
             while (reader.ready())
             {
-                 txt += reader.readLine();
+                txt += reader.readLine();
             }
+            reader.close();
         } catch (FileNotFoundException e) {
             throw new RuntimeException(e);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-        String[] good = txt.split(";");
-        for (String s : good){
-            String[] g = s.split(",");
-            for (int i = 0; i < g.length; i++) g[i] = g[i].trim();
+        if (!txt.isEmpty()) {
+            String[] good = txt.split(";");
+            for (String s : good) {
+                String[] g = s.split(",");
+                for (int i = 0; i < g.length; i++) g[i] = g[i].trim();
 
-            goods.add(new Good(g[0], g[1], g[2], Integer.parseInt(g[3]), Double.parseDouble(g[4])));
+                goods.add(new Good(g[0], g[1], g[2], Integer.parseInt(g[3]), Double.parseDouble(g[4])));
 
+            }
+        }
+    }
+    public void deleteGood(Good good) {
+        goods.remove(good);
+    }
+    public void deleteGoodFile(){
+        try {
+            Files.delete(Paths.get(file));
+        } catch (IOException e) {
+            throw new RuntimeException(e);
         }
     }
     public void writeGoods(){
@@ -53,10 +74,7 @@ public class Group {
         return goods;
     }
     public String toString(){
-        if(name == null && description == null) return "Група не визначена";
-        if(name == null) return "Група не визначена" + ": " + description;
-        if(description == null) return name + ": " + "Опис не визначено";
-        return name + ": " + description;
+        return name + " (" + description + ")";
     }
     public void addGood(Good good) {
         goods.add(good);
@@ -66,5 +84,20 @@ public class Group {
     }
     public String getDescription() {
         return description;
+    }
+    public void setName(String name) {
+        this.name = name;
+        try {
+            Files.delete(Paths.get(file));
+            file = "FIles\\" + name + ".txt";
+            FileWriter writer = new FileWriter(file);
+            writer.write("");
+            writer.close();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+    public void setDescription(String description) {
+        this.description = description;
     }
 }

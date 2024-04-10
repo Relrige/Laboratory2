@@ -12,6 +12,7 @@ public class Storage {
 
     public void deleteGroup(Group group) {
         groupList.remove(group);
+        group.deleteGoodFile();
     }
     public void readGroups(String file){
         StringBuilder txt = new StringBuilder();
@@ -19,10 +20,9 @@ public class Storage {
             BufferedReader reader = new BufferedReader(new FileReader(file));
             while (reader.ready())
             {
-                 txt.append(reader.readLine());
+                txt.append(reader.readLine());
             }
-        } catch (FileNotFoundException e) {
-            throw new RuntimeException(e);
+            reader.close();
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -30,10 +30,21 @@ public class Storage {
         for (String s : group){
             String[] g = s.split(",");
             if(g.length == 1) {
-                groupList.add(new Group(g[0], "Опис не визначено"));
+                groupList.add(new Group(g[0], "опис не визначено"));
             } else {
                 groupList.add(new Group(g[0], g[1]));
             }
+        }
+    }
+    void writeGroups(String file){
+        try {
+            java.io.FileWriter writer = new java.io.FileWriter(file);
+            for (Group g : groupList){
+                writer.write(g.getName() + ", " + g.getDescription() + ";\n");
+            }
+            writer.close();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
         }
     }
     public List<Group> getGroupList() {
