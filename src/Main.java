@@ -192,14 +192,133 @@ public class Main {
             JButton addGood = new CoolButton("Додати товар");
             JButton editGood = new CoolButton("Редагувати товар");
             JButton deleteGood = new CoolButton("Видалити товар");
+            JButton searchGood = new CoolButton("Пошук товару");
+            JButton changeAmount = new CoolButton("Прийняти/списати товар");
             JButton back1 = new CoolButton("Назад");
-            JButton[] buttons = {addGood, editGood, deleteGood, back1};
+            JButton[] buttons = {addGood, editGood, deleteGood, searchGood, changeAmount, back1};
             goodsFrame.setInfoPanel("Товари");
             goodsFrame.setButtonPanel(buttons);
             goodsFrame.setVisible(true);
             back1.addActionListener(e2 -> {
                 goodsFrame.setVisible(false);
                 menu.setVisible(true);
+            });
+            searchGood.addActionListener(e2 -> {
+                goodsFrame.setVisible(false);
+                StandartFrame searchGoodFrame = new StandartFrame("Пошук товару");
+                JTextField searchField = new JTextField();
+                searchGoodFrame.setTextInputPanel(new JTextField[]{searchField}, new JLabel[]{new JLabel("Назва товару")});
+                JButton searchButton = new CoolButton("Пошук");
+                JButton back2 = new CoolButton("Назад");
+                JButton[] buttons2 = {searchButton, back2};
+                searchGoodFrame.setButtonPanel(buttons2);
+                searchGoodFrame.setVisible(true);
+                back2.addActionListener(e3 -> {
+                    searchGoodFrame.setVisible(false);
+                    goodsFrame.setVisible(true);
+                });
+                searchButton.addActionListener(e3 -> {
+                    searchGoodFrame.setVisible(false);
+                    goodsFrame.setVisible(true);
+                    boolean found = false;
+                    for (Group group : storage.groupList) {
+                        for (Good good : group.goods) {
+                            if (good.getName().equalsIgnoreCase(searchField.getText())) {
+                                found = true;
+                                JOptionPane.showMessageDialog(searchGoodFrame, "Товар " + good.toString() + " З групи " + group.toString());
+                            }
+                        }
+                    }
+                    if (!found) {
+                        JOptionPane.showMessageDialog(searchGoodFrame, "Товар не знайдено");
+                    }
+                });
+            });
+            changeAmount.addActionListener(e -> {
+                goodsFrame.setVisible(false);
+                StandartFrame changeAmountFrame = new StandartFrame("Прийняти/списати товар");
+                String[] groupNames = new String[storage.groupList.size()];
+                for (int i = 0; i < storage.groupList.size(); i++) {
+                    groupNames[i] = storage.groupList.get(i).getName();
+                }
+                changeAmountFrame.setSearchPanel(Arrays.asList(groupNames));
+                JButton changeAmountButton = new CoolButton("Вибрати групу");
+                JButton back5 = new CoolButton("Назад");
+                JButton[] buttons5 = {changeAmountButton, back5};
+                changeAmountFrame.setButtonPanel(buttons5);
+                changeAmountFrame.setVisible(true);
+                back5.addActionListener(e3 -> {
+                    changeAmountFrame.setVisible(false);
+                    goodsFrame.setVisible(true);
+                });
+                changeAmountButton.addActionListener(e4 -> {
+                    changeAmountFrame.setVisible(false);
+                    Group group = storage.groupList.get(changeAmountFrame.list.getSelectedIndex());
+                    StandartFrame changeAmountFrame1 = new StandartFrame("Прийняти/списати товар");
+                    String[] goodNames = new String[group.goods.size()];
+                    for (int i = 0; i < group.goods.size(); i++) {
+                        goodNames[i] = group.goods.get(i).getName();
+                    }
+                    changeAmountFrame1.setSearchPanel(Arrays.asList(goodNames));
+                    changeAmountFrame1.setLayout(new GridLayout(4, 1));
+                    JPanel panel = new JPanel();
+                    panel.setLayout(new GridLayout(1, 2));
+                    JRadioButton accept = new JRadioButton("Прийняти");
+                    accept.setFont(new Font("Arial", Font.BOLD, 24));
+                    JRadioButton writeOff = new JRadioButton("Списати");
+                    accept.setHorizontalAlignment(SwingConstants.CENTER);
+                    writeOff.setHorizontalAlignment(SwingConstants.CENTER);
+                    writeOff.setFont(new Font("Arial", Font.BOLD, 24));
+                    ButtonGroup group1 = new ButtonGroup();
+                    writeOff.setBackground(new Color(217, 185, 155));
+                    accept.setBackground(new Color(217, 185, 155));
+                    group1.add(accept);
+                    group1.add(writeOff);
+                    group1.setSelected(accept.getModel(), true);
+                    panel.add(accept);
+                    panel.add(writeOff);
+                    JButton Accept = new CoolButton("Підтвердити");
+                    JButton back6 = new CoolButton("Назад");
+                    JButton[] buttons6 = {Accept, back6};
+                    JTextField amountField = new JTextField();
+                    JLabel amount = new JLabel("Кількість:");
+                    changeAmountFrame1.setTextInputPanel(new JTextField[]{amountField}, new JLabel[]{amount});
+                    changeAmountFrame1.add(panel);
+                    changeAmountFrame1.setButtonPanel(buttons6);
+                    changeAmountFrame1.setVisible(true);
+                    Accept.addActionListener(e5 -> {
+                        changeAmountFrame1.setVisible(false);
+                        goodsFrame.setVisible(true);
+                        if (amountField.getText().isEmpty()) {
+                            JOptionPane.showMessageDialog(changeAmountFrame1, "Введіть кількість товару");
+                            return;
+                        }
+                        if (!amountField.getText().matches("\\d+")) {
+                            JOptionPane.showMessageDialog(changeAmountFrame1, "Некоректні дані");
+                            return;
+                        }
+                        if (Integer.parseInt(amountField.getText()) <= 0) {
+                            JOptionPane.showMessageDialog(changeAmountFrame1, "Некоректні дані");
+                            return;
+                        }
+                        if (accept.isSelected()) {
+                            group.goods.get(changeAmountFrame1.list.getSelectedIndex()).setAmount(group.goods.get(changeAmountFrame1.list.getSelectedIndex()).getAmount() + Integer.parseInt(amountField.getText()));
+                        } else {
+                            if (group.goods.get(changeAmountFrame1.list.getSelectedIndex()).getAmount() - Integer.parseInt(amountField.getText()) < 0) {
+                                JOptionPane.showMessageDialog(changeAmountFrame1, "Недостатньо товару на складі");
+                                return;
+                            }
+                            group.goods.get(changeAmountFrame1.list.getSelectedIndex()).setAmount(group.goods.get(changeAmountFrame1.list.getSelectedIndex()).getAmount() - Integer.parseInt(amountField.getText()));
+                        }
+                        group.writeGoods();
+                    });
+
+
+                    back6.addActionListener(e5 -> {
+                        changeAmountFrame1.setVisible(false);
+                        changeAmountFrame.setVisible(true);
+                    });
+                });
             });
             addGood.addActionListener(e -> {
                 goodsFrame.setVisible(false);
@@ -304,16 +423,121 @@ public class Main {
                     JButton editGoodNameButton = new CoolButton("Редагувати назву товару");
                     JButton editGoodDescriptionButton = new CoolButton("Редагувати опис товару");
                     JButton editGoodProducerButton = new CoolButton("Редагувати виробника товару");
-                    JButton editGoodAmountButton = new CoolButton("Редагувати кількість товару");
                     JButton editGoodPriceButton = new CoolButton("Редагувати ціну товару");
                     JButton back7 = new CoolButton("Назад");
-                    JButton[] buttons7 = {editGoodNameButton, editGoodDescriptionButton, editGoodProducerButton, editGoodAmountButton, editGoodPriceButton, back7};
+                    JButton[] buttons7 = {editGoodNameButton, editGoodDescriptionButton, editGoodProducerButton, editGoodPriceButton, back7};
                     editGoodFrame1.setButtonPanel(buttons7);
                     editGoodFrame1.setVisible(true);
                     back7.addActionListener(e34 -> {
                         editGoodFrame1.setVisible(false);
                         editGoodFrame.setVisible(true);
                     });
+                    editGoodNameButton.addActionListener(e4 -> {
+                        editGoodFrame1.setVisible(false);
+                        StandartFrame editGoodNameFrame = new StandartFrame("Редагувати назву товару");
+                        JTextField goodNameField = new JTextField();
+                        editGoodNameFrame.setTextInputPanel(new JTextField[]{goodNameField}, new JLabel[]{new JLabel("Нова назва товару")});
+                        JButton editGoodNameButton1 = new CoolButton("Редагувати назву товару");
+                        JButton back8 = new CoolButton("Назад");
+                        JButton[] buttons8 = {editGoodNameButton1, back8};
+                        editGoodNameFrame.setButtonPanel(buttons8);
+                        editGoodNameFrame.setVisible(true);
+                        back8.addActionListener(e2 -> {
+                            editGoodNameFrame.setVisible(false);
+                            editGoodFrame1.setVisible(true);
+                        });
+                        editGoodNameButton1.addActionListener(e2 -> {
+                            editGoodNameFrame.setVisible(false);
+                            editGoodFrame.setVisible(true);
+                            if (goodNameField.getText().isEmpty()) {
+                                JOptionPane.showMessageDialog(editGoodNameFrame, "Введіть назву товару");
+                                return;
+                            }
+                            for (Group g : storage.groupList) {
+                                for (Good good : g.goods) {
+                                    if (good.getName().equalsIgnoreCase(goodNameField.getText())) {
+                                        JOptionPane.showMessageDialog(editGoodNameFrame, "Товар з такою назвою вже існує");
+                                        return;
+                                    }
+                                }
+                            }
+                            group.goods.get(editGoodFrame1.list.getSelectedIndex()).setName(goodNameField.getText());
+                            group.writeGoods();
+                        });
+                    });
+                    editGoodDescriptionButton.addActionListener(e3 -> {
+                        editGoodFrame1.setVisible(false);
+                        StandartFrame editGoodDescriptionFrame = new StandartFrame("Редагувати опис товару");
+                        JTextField goodDescriptionField = new JTextField();
+                        editGoodDescriptionFrame.setTextInputPanel(new JTextField[]{goodDescriptionField}, new JLabel[]{new JLabel("Новий опис товару")});
+                        JButton editGoodDescriptionButton1 = new CoolButton("Редагувати опис товару");
+                        JButton back9 = new CoolButton("Назад");
+                        JButton[] buttons9 = {editGoodDescriptionButton1, back9};
+                        editGoodDescriptionFrame.setButtonPanel(buttons9);
+                        editGoodDescriptionFrame.setVisible(true);
+                        back9.addActionListener(e4 -> {
+                            editGoodDescriptionFrame.setVisible(false);
+                            editGoodFrame1.setVisible(true);
+                        });
+                        editGoodDescriptionButton1.addActionListener(e4 -> {
+                            editGoodDescriptionFrame.setVisible(false);
+                            editGoodFrame1.setVisible(true);
+                            group.goods.get(editGoodFrame1.list.getSelectedIndex()).setDescription(goodDescriptionField.getText());
+                            group.writeGoods();
+                        });
+                    });
+                    editGoodProducerButton.addActionListener(e2 -> {
+                        editGoodFrame1.setVisible(false);
+                        StandartFrame editGoodProducerFrame = new StandartFrame("Редагувати виробника товару");
+                        JTextField goodProducerField = new JTextField();
+                        editGoodProducerFrame.setTextInputPanel(new JTextField[]{goodProducerField}, new JLabel[]{new JLabel("Новий виробник товару")});
+                        JButton editGoodProducerButton1 = new CoolButton("Редагувати виробника товару");
+                        JButton back10 = new CoolButton("Назад");
+                        JButton[] buttons10 = {editGoodProducerButton1, back10};
+                        editGoodProducerFrame.setButtonPanel(buttons10);
+                        editGoodProducerFrame.setVisible(true);
+                        back10.addActionListener(e3 -> {
+                            editGoodProducerFrame.setVisible(false);
+                            editGoodFrame1.setVisible(true);
+                        });
+                        editGoodProducerButton1.addActionListener(e3 -> {
+                            editGoodProducerFrame.setVisible(false);
+                            editGoodFrame1.setVisible(true);
+                            group.goods.get(editGoodFrame1.list.getSelectedIndex()).setProducer(goodProducerField.getText());
+                            group.writeGoods();
+                        });
+
+                    });
+                    editGoodPriceButton.addActionListener(e3 -> {
+                        editGoodFrame1.setVisible(false);
+                        StandartFrame editGoodPriceFrame = new StandartFrame("Редагувати ціну товару");
+                        JTextField goodPriceField = new JTextField();
+                        editGoodPriceFrame.setTextInputPanel(new JTextField[]{goodPriceField}, new JLabel[]{new JLabel("Нова ціна товару")});
+                        JButton editGoodPriceButton1 = new CoolButton("Редагувати ціну товару");
+                        JButton back12 = new CoolButton("Назад");
+                        JButton[] buttons12 = {editGoodPriceButton1, back12};
+                        editGoodPriceFrame.setButtonPanel(buttons12);
+                        editGoodPriceFrame.setVisible(true);
+                        back12.addActionListener(e4 -> {
+                            editGoodPriceFrame.setVisible(false);
+                            editGoodFrame1.setVisible(true);
+                        });
+                        editGoodPriceButton1.addActionListener(e4 -> {
+                            editGoodPriceFrame.setVisible(false);
+                            editGoodFrame1.setVisible(true);
+                            if (!goodPriceField.getText().matches("\\d+\\.\\d+") && !goodPriceField.getText().matches("\\d+")) {
+                                JOptionPane.showMessageDialog(editGoodPriceFrame, "Некоректні дані");
+                                return;
+                            }
+                            if (Double.parseDouble(goodPriceField.getText()) <= 0) {
+                                JOptionPane.showMessageDialog(editGoodPriceFrame, "Некоректні дані");
+                                return;
+                            }
+                            group.goods.get(editGoodFrame1.list.getSelectedIndex()).setPrice(Double.parseDouble(goodPriceField.getText()));
+                            group.writeGoods();
+                        });
+                    });
+
 
                 });
 

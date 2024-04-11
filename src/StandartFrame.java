@@ -16,16 +16,18 @@ public class StandartFrame extends JFrame {
         setLayout(new GridLayout(2, 1));
     }
     public void setTextInputPanel(JTextField[] textField, JLabel[] label) {
-       textInputPanel = new JPanel();
-       textInputPanel.setLayout(new GridLayout(textField.length, 2));
-       textInputPanel.setBackground(new Color(217, 185, 155));
-         for (int i = 0; i < textField.length; i++) {
-             textInputPanel.add(label[i]);
-             label[i].setFont(new Font("Arial", Font.BOLD, 24));
-             textInputPanel.add(textField[i]);
-             textField[i].setFont(new Font("Arial", Font.BOLD, 18));
-         }
-         add(textInputPanel);
+        textInputPanel = new JPanel();
+        textInputPanel.setBorder(BorderFactory.createLineBorder(Color.BLACK, 5));
+        textInputPanel.setLayout(new GridLayout(textField.length, 2));
+        textInputPanel.setBackground(new Color(217, 185, 155));
+        for (int i = 0; i < textField.length; i++) {
+            textInputPanel.add(label[i]);
+            label[i].setHorizontalAlignment(SwingConstants.CENTER);
+            label[i].setFont(new Font("Arial", Font.BOLD, 24));
+            textInputPanel.add(textField[i]);
+            textField[i].setFont(new Font("Arial", Font.BOLD, 18));
+        }
+        add(textInputPanel);
     }
     public void setInfoPanel(String text) {
         infoPanel = new JPanel();
