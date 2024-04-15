@@ -6,7 +6,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Storage {
-    List<Group> groupList = new ArrayList<>();
+    ArrayList<Group> groupList = new ArrayList<>();
     public Storage() {
     }
 

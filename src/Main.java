@@ -1,9 +1,12 @@
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.io.*;
 import java.util.Arrays;
 
 public class Main {
+    static MyTable myTable;
     public static void main(String[] args) {
         Storage storage = new Storage();
         File file = new File("Files\\groups.txt");
@@ -23,13 +26,39 @@ public class Main {
 
         if (!txt.isEmpty()) storage.readGroups("Files\\groups.txt");
         StandartFrame menu = new StandartFrame("Tester");
+        JButton main = new CoolButton("Головна");
         JButton groups = new CoolButton("Групи товарів");
         JButton goods = new CoolButton("Товари");
         JButton stats = new CoolButton("Статистика");
-        JButton[] b = {groups, goods, stats};
+        JButton[] b = {main,groups, goods, stats};
         menu.setInfoPanel("Управління підприємством");
         menu.setButtonPanel(b);
         menu.setVisible(true);
+
+        main.addActionListener(e -> {
+            for (Group group : storage.groupList) {
+                group.readGoods();
+            }
+            menu.setVisible(false);
+            myTable= new MyTable(storage.groupList);
+            myTable.setVisible(true);
+            myTable.getBackButton().addActionListener(e1 -> {
+                myTable.setVisible(false);
+                menu.setVisible(true);
+            });
+            goodsWindow(myTable.getGoodButton(),storage,menu);
+
+        });
+
+        groupsWindow(groups, menu, storage);
+
+        goodsWindow(goods, storage, menu);
+
+        statsWindow(stats, menu, storage);
+
+    }
+
+    private static void groupsWindow(JButton groups, StandartFrame menu, Storage storage) {
         groups.addActionListener(e -> {
             menu.setVisible(false);
             StandartFrame groupsFrame = new StandartFrame("Групи товарів");
@@ -183,6 +212,9 @@ public class Main {
                 });
             });
         });
+    }
+
+    private static void goodsWindow(JButton goods, Storage storage, StandartFrame menu) {
         goods.addActionListener(e1 -> {
             for (Group group : storage.groupList) {
                 group.readGoods();
@@ -200,8 +232,13 @@ public class Main {
             goodsFrame.setButtonPanel(buttons);
             goodsFrame.setVisible(true);
             back1.addActionListener(e2 -> {
-                goodsFrame.setVisible(false);
-                menu.setVisible(true);
+                if(myTable!=null&& myTable.isVisible()){
+                    goodsFrame.setVisible(false);
+                }
+                else {
+                    goodsFrame.setVisible(false);
+                    menu.setVisible(true);
+                }
             });
             searchGood.addActionListener(e2 -> {
                 goodsFrame.setVisible(false);
@@ -311,6 +348,8 @@ public class Main {
                             group.goods.get(changeAmountFrame1.list.getSelectedIndex()).setAmount(group.goods.get(changeAmountFrame1.list.getSelectedIndex()).getAmount() - Integer.parseInt(amountField.getText()));
                         }
                         group.writeGoods();
+                        if(myTable!=null)
+                            myTable.refresh();
                     });
 
 
@@ -389,8 +428,9 @@ public class Main {
 
                         group.goods.add(new Good(goodNameField.getText(), goodDescriptionField.getText(), goodProducerField.getText(), Integer.parseInt(goodAmountField.getText()), Double.parseDouble(goodPriceField.getText())));
                         group.writeGoods();
+                        if(myTable!=null)
+                            myTable.refresh();
                     });
-
 
                 });
             });
@@ -463,6 +503,8 @@ public class Main {
                             }
                             group.goods.get(editGoodFrame1.list.getSelectedIndex()).setName(goodNameField.getText());
                             group.writeGoods();
+                            if(myTable!=null)
+                                myTable.refresh();
                         });
                     });
                     editGoodDescriptionButton.addActionListener(e3 -> {
@@ -484,6 +526,8 @@ public class Main {
                             editGoodFrame1.setVisible(true);
                             group.goods.get(editGoodFrame1.list.getSelectedIndex()).setDescription(goodDescriptionField.getText());
                             group.writeGoods();
+                            if(myTable!=null)
+                                myTable.refresh();
                         });
                     });
                     editGoodProducerButton.addActionListener(e2 -> {
@@ -505,6 +549,8 @@ public class Main {
                             editGoodFrame1.setVisible(true);
                             group.goods.get(editGoodFrame1.list.getSelectedIndex()).setProducer(goodProducerField.getText());
                             group.writeGoods();
+                            if(myTable!=null)
+                                myTable.refresh();
                         });
 
                     });
@@ -535,6 +581,8 @@ public class Main {
                             }
                             group.goods.get(editGoodFrame1.list.getSelectedIndex()).setPrice(Double.parseDouble(goodPriceField.getText()));
                             group.writeGoods();
+                            if(myTable!=null)
+                                myTable.refresh();
                         });
                     });
 
@@ -583,11 +631,16 @@ public class Main {
                         goodsFrame.setVisible(true);
                         group.deleteGood(group.goods.get(deleteGoodFrame1.list.getSelectedIndex()));
                         group.writeGoods();
+                        if(myTable!=null)
+                            myTable.refresh();
                     });
                 });
             });
 
         });
+    }
+
+    private static void statsWindow(JButton stats, StandartFrame menu, Storage storage) {
         stats.addActionListener(e -> {
             menu.setVisible(false);
             storage.readGroups("Files\\groups.txt");
