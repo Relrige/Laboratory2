@@ -4,7 +4,9 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
-
+/**
+ * A JFrame subclass to display a table of goods with filtering and search functionalities.
+ */
 public class MyTable extends JFrame {
     private JTable table;
     private DefaultTableModel model;
@@ -14,6 +16,11 @@ public class MyTable extends JFrame {
     private JButton goodButton;
     private JTextField searchField;
     private JButton searchButton;
+    /**
+     * Constructs a MyTable object.
+     *
+     * @param groups ArrayList of Group objects containing goods data.
+     */
     public MyTable(ArrayList<Group> groups) {
         this.groups = groups;
         setTitle("Goods Table");
@@ -144,6 +151,9 @@ public class MyTable extends JFrame {
         setVisible(true);
 
     }
+    /**
+     * Searches for goods based on the entered text in the search field.
+     */
     private void searchGoods() {
         String searchText = searchField.getText().trim().toLowerCase();
 
@@ -156,15 +166,16 @@ public class MyTable extends JFrame {
         // Iterate through all goods and add matching ones to the table
         for (Group group : groups) {
             for (Good good : group.getGoodsList()) {
-                if (good.getName().toLowerCase().matches(regex) ||
-                        good.getDescription().toLowerCase().matches(regex)) {
+                if (good.getName().toLowerCase().matches(regex)) {
                     Object[] row = {good.getName(), good.getDescription(), good.getProducer(), good.getAmount(), good.getPrice()};
                     model.addRow(row);
                 }
             }
         }
     }
-
+    /**
+     * Refreshes the table to show all goods.
+     */
     public void refresh() {
         groupComboBox.setSelectedIndex(0);
         model.setRowCount(0);
@@ -175,9 +186,19 @@ public class MyTable extends JFrame {
             }
         }
     }
+    /**
+     * Gets the back button.
+     *
+     * @return The back button.
+     */
     public JButton getBackButton() {
         return backButton;
     }
+    /**
+     * Gets the good button.
+     *
+     * @return The good button.
+     */
     public JButton getGoodButton() {
         return goodButton;
     }

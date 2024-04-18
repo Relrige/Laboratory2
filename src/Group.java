@@ -3,13 +3,21 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
-
+/**
+ * A class representing a group of goods.
+ */
 public class Group {
     List<Good> goods = new ArrayList<>();
     private String name;
     private String description;
 
     private String file;
+    /**
+     * Constructs a Group object with the specified name and description.
+     *
+     * @param name        The name of the group.
+     * @param description The description of the group.
+     */
     public Group (String name, String description){
         this.name = name.trim();
         this.description = description.trim();
@@ -22,6 +30,9 @@ public class Group {
             }
         }
     }
+    /**
+     * Reads goods from the group's file and adds them to the goods list.
+     */
     public void readGoods(){
         String txt = "";
         File file = new File(this.file);
@@ -49,15 +60,29 @@ public class Group {
             }
         }
     }
+    /**
+     * Retrieves a good by its name.
+     *
+     * @param name The name of the good to retrieve.
+     * @return The good with the specified name, or null if not found.
+     */
     public Good goodByName(String name){
         for (Good g : goods){
             if (g.getName().equals(name)) return g;
         }
         return null;
     }
+    /**
+     * Deletes a good from the group.
+     *
+     * @param good The good to delete.
+     */
     public void deleteGood(Good good) {
         goods.remove(good);
     }
+    /**
+     * Deletes the file associated with the group.
+     */
     public void deleteGoodFile(){
         try {
             Files.delete(Paths.get(file));
@@ -65,6 +90,9 @@ public class Group {
             throw new RuntimeException(e);
         }
     }
+    /**
+     * Writes the goods of the group to the group's file.
+     */
     public void writeGoods(){
         try {
             java.io.FileWriter writer = new java.io.FileWriter(file);
@@ -91,6 +119,11 @@ public class Group {
     public String getDescription() {
         return description;
     }
+    /**
+     * Sets the name of the group and updates the associated file.
+     *
+     * @param name The new name of the group.
+     */
     public void setName(String name) {
         this.name = name;
         try {

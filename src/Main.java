@@ -57,7 +57,13 @@ public class Main {
         statsWindow(stats, menu, storage);
 
     }
-
+    /**
+     * Opens the groups window to perform various operations like adding, editing, and deleting groups.
+     *
+     * @param groups  The JButton triggering the groups window.
+     * @param menu    The StandartFrame instance representing the main menu.
+     * @param storage The Storage instance containing groups data.
+     */
     private static void groupsWindow(JButton groups, StandartFrame menu, Storage storage) {
         groups.addActionListener(e -> {
             menu.setVisible(false);
@@ -213,7 +219,14 @@ public class Main {
             });
         });
     }
-
+    /**
+     * Opens the goods window to perform various operations like adding, editing, deleting goods,
+     * searching for goods, and changing their amount.
+     *
+     * @param goods   The JButton triggering the goods window.
+     * @param storage The Storage instance containing groups and goods data.
+     * @param menu    The StandartFrame instance representing the main menu.
+     */
     private static void goodsWindow(JButton goods, Storage storage, StandartFrame menu) {
         goods.addActionListener(e1 -> {
             for (Group group : storage.groupList) {
@@ -242,6 +255,7 @@ public class Main {
             });
             searchGood.addActionListener(e2 -> {
                 goodsFrame.setVisible(false);
+                // Create a new frame for searching goods
                 StandartFrame searchGoodFrame = new StandartFrame("Пошук товару");
                 JTextField searchField = new JTextField();
                 searchGoodFrame.setTextInputPanel(new JTextField[]{searchField}, new JLabel[]{new JLabel("Назва товару")});
@@ -250,23 +264,43 @@ public class Main {
                 JButton[] buttons2 = {searchButton, back2};
                 searchGoodFrame.setButtonPanel(buttons2);
                 searchGoodFrame.setVisible(true);
+                // ActionListener for going back
                 back2.addActionListener(e3 -> {
                     searchGoodFrame.setVisible(false);
                     goodsFrame.setVisible(true);
                 });
+                // ActionListener for performing the search
                 searchButton.addActionListener(e3 -> {
                     searchGoodFrame.setVisible(false);
                     goodsFrame.setVisible(true);
                     boolean found = false;
+                    String name = searchField.getText().toLowerCase().trim().replaceAll("\\*", ".*").replaceAll("\\?", ".");
+                    String text = "";
+
+                    // Iterate through groups and goods to find matching goods
                     for (Group group : storage.groupList) {
                         for (Good good : group.goods) {
-                            if (good.getName().equalsIgnoreCase(searchField.getText())) {
+                            if (good.getName().toLowerCase().matches(name)) {
                                 found = true;
-                                JOptionPane.showMessageDialog(searchGoodFrame, "Товар " + good.toString() + " З групи " + group.toString());
+                                text += "Назва: " + good.getName() + "\n" + "Опис: " + good.getDescription() + "\n" + "Виробник: " + good.getProducer() + "\n" + "Кількість: " + good.getAmount() + "\n" + "Ціна: " + good.getPrice() + "\n" + "Група: " + group.getName() + "\n\n";
                             }
                         }
                     }
-                    if (!found) {
+
+                    // Display search results
+                    if (found) {
+                        JOptionPane optionPane = new JOptionPane();
+                        JScrollPane scrollPane = new JScrollPane();
+                        JTextArea textArea = new JTextArea();
+                        textArea.setText(text);
+                        textArea.setEditable(false);
+                        scrollPane.setViewportView(textArea);
+                        optionPane.setMessage(scrollPane);
+                        optionPane.setMessageType(JOptionPane.INFORMATION_MESSAGE);
+                        optionPane.setPreferredSize(new Dimension(500, 500));
+                        JDialog dialog = optionPane.createDialog(null, "Результат пошуку");
+                        dialog.setVisible(true);
+                    } else {
                         JOptionPane.showMessageDialog(searchGoodFrame, "Товар не знайдено");
                     }
                 });
@@ -639,7 +673,13 @@ public class Main {
 
         });
     }
-
+    /**
+     * Opens a statistics window when the stats button is clicked.
+     *
+     * @param stats   The button triggering the statistics window.
+     * @param menu    The main menu frame.
+     * @param storage The storage object containing group and goods data.
+     */
     private static void statsWindow(JButton stats, StandartFrame menu, Storage storage) {
         stats.addActionListener(e -> {
             menu.setVisible(false);
@@ -751,14 +791,19 @@ public class Main {
 
             });
             allGoodsPrice.addActionListener(e2 ->{
-                String storagePrice = "Загальна ціна товарів на складі: ";
+                String storagePrice = "Загальна ціна товарів на складі: \n";
                 double allPrice = 0;
+                double groupPrice = 0;
                 for (Group group : storage.groupList) {
                     for (Good good : group.goods) {
+                        groupPrice +=good.getPrice()*good.getAmount();
                         allPrice += good.getPrice() * good.getAmount();
+
                     }
+                    storagePrice += group.getName() + ": " + groupPrice +" грн\n";
+                    groupPrice = 0;
                 }
-                storagePrice += allPrice + " грн";
+                storagePrice += "Загалом: " + allPrice + " грн";
                 JOptionPane.showMessageDialog(statsFrame, storagePrice);
             });
             groupGoodsPrice.addActionListener(e1 -> {
@@ -782,11 +827,14 @@ public class Main {
                 chooseGroupButton.addActionListener(e2 -> {
                     Group group = storage.groupList.get(chooseGroup.list.getSelectedIndex());
                     double groupPrice = 0;
-                    String groupPriceString = "Вартість товарів у групі " + group.getName() + ": ";
+                    double goodPrice = 0;
+                    String groupPriceString = "Вартість товарів у групі " + group.getName() + ": \n";
                     for (Good good : group.goods) {
                         groupPrice += good.getPrice() * good.getAmount();
+                        goodPrice = good.getPrice() * good.getAmount();
+                        groupPriceString += good.getName() +": " + goodPrice+"\n";
                     }
-                    groupPriceString += groupPrice + " грн";
+                    groupPriceString += "Загалом: " + groupPrice + " грн";
                     JOptionPane.showMessageDialog(chooseGroup, groupPriceString);
 
                 });
